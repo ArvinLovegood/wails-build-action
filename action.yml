@@ -252,7 +252,7 @@ runs:
     - name: Compress binary with UPX
       shell: powershell
       if: runner.os == 'Windows'
-      run: upx.exe --best ${{inputs.build-name}}
+      run: ${{ inputs.app-working-directory }}/upx-3.96-win64/upx.exe --best ${{inputs.build-name}}
 
     # Upload build assets
     - uses: actions/upload-artifact@v4

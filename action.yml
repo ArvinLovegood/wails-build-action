@@ -35,6 +35,10 @@ inputs:
     description: "Build commit message"
     required: false
     default: ""  
+  build-statement:
+    description: "Build statement message"
+    required: false
+    default: ""  
   wails-version:
     description: "Wails version to use"
     required: false

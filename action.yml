@@ -152,7 +152,7 @@ runs:
     - name: Build App
       if: inputs.build == 'true' && runner.os == 'macOS'
       working-directory: ${{ inputs.app-working-directory }}
-      run: wails build --platform ${{inputs.build-platform}} -webview2 ${{inputs.wails-build-webview2}} -o ${{ inputs.app-working-directory }}/build/bin/${{inputs.build-name}} -tags '${{inputs.build-tags}}' -ldflags "-X main.Version=${{inputs.build-tags}} -X main.VersionCommit=${{inputs.build-commit-message}} -X main.OFFICIAL_STATEMENT=${{inputs.build-statement}}"
+      run: wails build --platform ${{inputs.build-platform}} -webview2 ${{inputs.wails-build-webview2}} -o ${{inputs.build-name}} -tags '${{inputs.build-tags}}' -ldflags "-X main.Version=${{inputs.build-tags}} -X main.VersionCommit=${{inputs.build-commit-message}} -X main.OFFICIAL_STATEMENT=${{inputs.build-statement}}"
       shell: bash
     - name: Build App
       if: inputs.build == 'true' &&  runner.os == 'Linux'
@@ -209,7 +209,10 @@ runs:
       working-directory: ${{ inputs.app-working-directory }}
       shell: bash
       run: |
-        ditto -c -k --keepParent ${{ inputs.app-working-directory }}/build/bin/${{inputs.build-name}} ${{ inputs.app-working-directory }}/build/bin/${{inputs.build-name}}.zip
+        ls
+        cd ./build/bin
+        ls
+        ditto -c -k --keepParent ${{ inputs.app-working-directory }}/build/bin/${{inputs.build-name}} ./build/bin/${{inputs.build-name}}.zip
     - name: Building Installer
       if: runner.os == 'macOS' && inputs.sign != 'false' && inputs.sign-macos-installer-id != '' && startsWith(github.ref, 'refs/tags/')
       shell: bash

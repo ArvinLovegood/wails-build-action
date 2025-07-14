@@ -152,16 +152,16 @@ runs:
       if: runner.os == 'macOS'
       run: brew install mitchellh/gon/gon
       shell: bash
-    - name: Install macOS upx
-      if: runner.os == 'macOS'
-      run: brew install upx
-      shell: bash
+    # - name: Install macOS upx
+    #   if: runner.os == 'macOS'
+    #   run: brew install upx
+    #   shell: bash
       
     # Building step
     - name: Build App
       if: inputs.build == 'true' && runner.os == 'macOS'
       working-directory: ${{ inputs.app-working-directory }}
-      run: wails build -upx -upxflags -9 --platform ${{inputs.build-platform}} -webview2 ${{inputs.wails-build-webview2}} -o ${{inputs.build-name}} -tags '${{inputs.build-tags}}' -ldflags "-X main.Version=${{inputs.build-tags}}  -X main.BuildKey=${{inputs.build-key}} -X main.VersionCommit=${{inputs.build-commit-message}} -X main.OFFICIAL_STATEMENT=${{inputs.build-statement}}"
+      run: wails build --platform ${{inputs.build-platform}} -webview2 ${{inputs.wails-build-webview2}} -o ${{inputs.build-name}} -tags '${{inputs.build-tags}}' -ldflags "-X main.Version=${{inputs.build-tags}}  -X main.BuildKey=${{inputs.build-key}} -X main.VersionCommit=${{inputs.build-commit-message}} -X main.OFFICIAL_STATEMENT=${{inputs.build-statement}}"
       shell: bash
     - name: Build App
       if: inputs.build == 'true' &&  runner.os == 'Linux'

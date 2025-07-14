@@ -244,7 +244,7 @@ runs:
       shell: bash
       working-directory: ${{ inputs.app-working-directory }}
       run: |
-        productbuild --component ${{ inputs.app-working-directory }}/build/bin/${{inputs.build-name}}.app /Applications ./build/bin/${{inputs.build-name}}.pkg
+        productbuild --component ${{ inputs.app-working-directory }}/build/bin/go-stock.app /Applications ./build/bin/${{inputs.build-name}}.pkg
 
     - name: Test file2                     
       if: runner.os == 'macOS'                     

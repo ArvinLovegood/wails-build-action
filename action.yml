@@ -282,15 +282,15 @@ runs:
         & 'C:/Program Files (x86)/Windows Kits/10/bin/10.0.17763.0/x86/signtool.exe' sign /fd sha256 /tr http://ts.ssl.com /f certificate\certificate.pfx /p '${{ inputs.sign-windows-cert-password }}' .\build\bin\${{inputs.build-name}}.exe
         echo "Signing Installer" & 'C:/Program Files (x86)/Windows Kits/10/bin/10.0.17763.0/x86/signtool.exe' sign /fd sha256 /tr http://ts.ssl.com /f certificate\certificate.pfx /p '${{ inputs.sign-windows-cert-password }}' .\build\bin\${{inputs.build-name}}-amd64-installer.exe
 
-    - name: Download UPX and  Compress binary with UPX for Windows
-      shell: powershell
-      if: runner.os == 'Windows'
-      working-directory: ${{ inputs.app-working-directory }}
-      run: |
-        Invoke-WebRequest -Uri https://github.com/upx/upx/releases/download/v3.96/upx-3.96-win64.zip -OutFile upx.zip
-        Expand-Archive -Path upx.zip -DestinationPath.
-        Get-ChildItem
-        upx-3.96-win64\upx.exe --best ${{ inputs.app-working-directory }}/build/bin/${{inputs.build-name}}
+    # - name: Download UPX and  Compress binary with UPX for Windows
+    #   shell: powershell
+    #   if: runner.os == 'Windows'
+    #   working-directory: ${{ inputs.app-working-directory }}
+    #   run: |
+    #     Invoke-WebRequest -Uri https://github.com/upx/upx/releases/download/v3.96/upx-3.96-win64.zip -OutFile upx.zip
+    #     Expand-Archive -Path upx.zip -DestinationPath.
+    #     Get-ChildItem
+    #     upx-3.96-win64\upx.exe --best ${{ inputs.app-working-directory }}/build/bin/${{inputs.build-name}}
 
     # Upload build assets
     - uses: actions/upload-artifact@v4

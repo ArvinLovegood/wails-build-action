@@ -158,16 +158,16 @@ runs:
     #   shell: bash
 
     - name: Install  NSIS
-       if: runner.os == 'Windows' && inputs.nsis == 'true'
-       working-directory: ${{ inputs.app-working-directory }}
-       run:  |
+      if: runner.os == 'Windows' && inputs.nsis == 'true'
+      working-directory: ${{ inputs.app-working-directory }}
+      run:  |
         echo "Install  Scope"
         Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
         Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
         echo "Install  NSIS"
         scoop bucket add extras
         scoop install nsis
-       shell: powershell
+      shell: powershell
       
     # Building step
     - name: Build App

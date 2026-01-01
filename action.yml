@@ -241,7 +241,7 @@ runs:
       working-directory: ${{ inputs.app-working-directory }}              
       shell: bash              
       run: |      
-        cp ${{ inputs.app-working-directory }}/build/bin/go-stock.app/Contents/MacOS/${{inputs.build-name}} ./build/bin/${{inputs.build-name}}   
+        cp ${{ inputs.app-working-directory }}/build/bin/go-stock.app/Contents/MacOS/* ./build/bin/${{inputs.build-name}}   
         
     - name: Build .app zip file
       if: runner.os == 'macOS'

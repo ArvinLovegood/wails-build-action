@@ -111,10 +111,6 @@ inputs:
     description: "Windows Signing Certificate Password"
     required: false
     default: ''
-  upx:
-    description: "Compress binaries with UPX"
-    required: false
-    default: "false"
 
 runs:
   using: "composite"
@@ -209,68 +205,6 @@ runs:
       working-directory: ${{ inputs.app-working-directory }}
       run: chmod +x build/bin/*
       shell: bash
-    # UPX Compression
-    - name: Download UPX for Windows
-      if: inputs.upx == 'true' && runner.os == 'Windows'
-      working-directory: ${{ inputs.app-working-directory }}
-      shell: powershell
-      run: |
-        Invoke-WebRequest -Uri https://github.com/upx/upx/releases/download/v4.2.4/upx-4.2.4-win64.zip -OutFile upx.zip
-        Expand-Archive -Path upx.zip -DestinationPath .
-    - name: Compress Windows binary with UPX
-      if: inputs.upx == 'true' && runner.os == 'Windows'
-      working-directory: ${{ inputs.app-working-directory }}
-      shell: powershell
-      run: |
-        # build-name 可能已包含 .exe 后缀，避免重复追加
-        $binName = "${{inputs.build-name}}"
-        if ($binName -notmatch '\.exe$') { $binName = "$binName.exe" }
-        upx-4.2.4-win64\upx.exe --best ${{ inputs.app-working-directory }}/build/bin/$binName
-        Get-ChildItem ${{ inputs.app-working-directory }}/build/bin/*-installer.exe | ForEach-Object { upx-4.2.4-win64\upx.exe --best $_.FullName }
-    - name: Download UPX for Linux
-      if: inputs.upx == 'true' && runner.os == 'Linux'
-      working-directory: ${{ inputs.app-working-directory }}
-      shell: bash
-      run: |
-        wget https://github.com/upx/upx/releases/download/v4.2.4/upx-4.2.4-amd64_linux.tar.xz
-        tar -xf upx-4.2.4-amd64_linux.tar.xz
-    - name: Compress Linux binary with UPX
-      if: inputs.upx == 'true' && runner.os == 'Linux'
-      working-directory: ${{ inputs.app-working-directory }}
-      shell: bash
-      run: |
-        upx-4.2.4-amd64_linux/upx --best ${{ inputs.app-working-directory }}/build/bin/*
-    - name: Download UPX for macOS
-      if: inputs.upx == 'true' && runner.os == 'macOS'
-      working-directory: ${{ inputs.app-working-directory }}
-      shell: bash
-      run: |
-        wget https://github.com/upx/upx/releases/download/v4.2.4/upx-4.2.4-arm64_macos.tar.xz
-        wget https://github.com/upx/upx/releases/download/v4.2.4/upx-4.2.4-x86_64_macos.tar.xz
-        tar -xf upx-4.2.4-arm64_macos.tar.xz
-        tar -xf upx-4.2.4-x86_64_macos.tar.xz
-    - name: Compress macOS binary with UPX
-      if: inputs.upx == 'true' && runner.os == 'macOS'
-      working-directory: ${{ inputs.app-working-directory }}
-      shell: bash
-      run: |
-        # Note: UPX does NOT support universal/fat binaries, only compress single-arch binaries
-        # Compress arm64 binary if exists
-        for f in ${{ inputs.app-working-directory }}/build/bin/*.app/Contents/MacOS/*-arm64; do
-          [ -f "$f" ] && upx-4.2.4-arm64_macos/upx --best "$f" || true
-        done
-        # Compress x86_64 binary if exists
-        for f in ${{ inputs.app-working-directory }}/build/bin/*.app/Contents/MacOS/*-x86_64; do
-          [ -f "$f" ] && upx-4.2.4-x86_64_macos/upx --best "$f" || true
-        done
-    - name: Re-sign after UPX compression (Ad-hoc)
-      if: inputs.upx == 'true' && inputs.build == 'true' && runner.os == 'macOS' && (inputs.sign == 'false' || !startsWith(github.ref, 'refs/tags/'))
-      working-directory: ${{ inputs.app-working-directory }}
-      shell: bash
-      run: |
-        echo "Re-signing after UPX compression"
-        codesign --force --deep --sign - ${{ inputs.app-working-directory }}/build/bin/*.app
-        xattr -cr ${{ inputs.app-working-directory }}/build/bin/*.app
     # Package and Sign MacOS
     - name: Import Code-Signing Certificates for macOS
       if: runner.os == 'macOS' && inputs.sign != 'false' && startsWith(github.ref, 'refs/tags/')

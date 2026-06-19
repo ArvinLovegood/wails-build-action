@@ -161,17 +161,13 @@ runs:
     #   run: brew install upx
     #   shell: bash
 
-    # - name: Install  NSIS
-    #   if: runner.os == 'Windows' && inputs.nsis == 'true'
-    #   working-directory: ${{ inputs.app-working-directory }}
-    #   run: |
-    #     echo "Install  Scope"
-    #     Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-    #     Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
-    #     echo "Install  NSIS"
-    #     scoop bucket add extras
-    #     scoop install nsis
-    #   shell: powershell
+    - name: Install NSIS
+      if: runner.os == 'Windows' && inputs.nsis == 'true'
+      working-directory: ${{ inputs.app-working-directory }}
+      run: |
+        echo "Install NSIS"
+        choco install nsis -y
+      shell: powershell
       
     # Building step
     - name: Build App
@@ -226,7 +222,10 @@ runs:
       working-directory: ${{ inputs.app-working-directory }}
       shell: powershell
       run: |
-        upx-4.2.4-win64\upx.exe --best ${{ inputs.app-working-directory }}/build/bin/${{inputs.build-name}}.exe
+        # build-name 可能已包含 .exe 后缀，避免重复追加
+        $binName = "${{inputs.build-name}}"
+        if ($binName -notmatch '\.exe$') { $binName = "$binName.exe" }
+        upx-4.2.4-win64\upx.exe --best ${{ inputs.app-working-directory }}/build/bin/$binName
         Get-ChildItem ${{ inputs.app-working-directory }}/build/bin/*-installer.exe | ForEach-Object { upx-4.2.4-win64\upx.exe --best $_.FullName }
     - name: Download UPX for Linux
       if: inputs.upx == 'true' && runner.os == 'Linux'

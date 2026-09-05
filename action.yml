@@ -169,22 +169,45 @@ runs:
     - name: Build App
       if: inputs.build == 'true' && runner.os == 'macOS'
       working-directory: ${{ inputs.app-working-directory }}
-      run: wails build --platform ${{inputs.build-platform}} -webview2 ${{inputs.wails-build-webview2}} -o ${{inputs.build-name}} -tags '${{inputs.build-tags}}' -ldflags "-X main.Version=${{inputs.build-tags}}  -X main.BuildKey=${{inputs.build-key}} -X main.VersionCommit=${{inputs.build-commit-message}} -X main.OFFICIAL_STATEMENT=${{inputs.build-statement}}"
+      # ldflags 各值经 env 传递并用单引号包裹：go 的 -ldflags 按空格分词，
+      # 值内含空格（如中文 commit message）必须单引号包裹，否则炸链接器；
+      # env 传递避免值内 $/`/" 被 bash 二次解释（注入风险）
+      env:
+        LDFLAGS_VERSION: ${{ inputs.build-tags }}
+        LDFLAGS_BUILD_KEY: ${{ inputs.build-key }}
+        LDFLAGS_COMMIT_MESSAGE: ${{ inputs.build-commit-message }}
+        LDFLAGS_STATEMENT: ${{ inputs.build-statement }}
+      run: wails build --platform ${{inputs.build-platform}} -webview2 ${{inputs.wails-build-webview2}} -o ${{inputs.build-name}} -tags '${{inputs.build-tags}}' -ldflags "-X 'main.Version=${LDFLAGS_VERSION}' -X 'main.BuildKey=${LDFLAGS_BUILD_KEY}' -X 'main.VersionCommit=${LDFLAGS_COMMIT_MESSAGE}' -X 'main.OFFICIAL_STATEMENT=${LDFLAGS_STATEMENT}'"
       shell: bash
     - name: Build App
       if: inputs.build == 'true' &&  runner.os == 'Linux'
       working-directory: ${{ inputs.app-working-directory }}
-      run: wails build --platform ${{inputs.build-platform}} -webview2 ${{inputs.wails-build-webview2}} -o ${{inputs.build-name}} -tags '${{inputs.build-tags}}' -ldflags "-X main.Version=${{inputs.build-tags}} -X main.BuildKey=${{inputs.build-key}}  -X main.VersionCommit=${{inputs.build-commit-message}}  -X main.OFFICIAL_STATEMENT=${{inputs.build-statement}}"
+      env:
+        LDFLAGS_VERSION: ${{ inputs.build-tags }}
+        LDFLAGS_BUILD_KEY: ${{ inputs.build-key }}
+        LDFLAGS_COMMIT_MESSAGE: ${{ inputs.build-commit-message }}
+        LDFLAGS_STATEMENT: ${{ inputs.build-statement }}
+      run: wails build --platform ${{inputs.build-platform}} -webview2 ${{inputs.wails-build-webview2}} -o ${{inputs.build-name}} -tags '${{inputs.build-tags}}' -ldflags "-X 'main.Version=${LDFLAGS_VERSION}' -X 'main.BuildKey=${LDFLAGS_BUILD_KEY}' -X 'main.VersionCommit=${LDFLAGS_COMMIT_MESSAGE}' -X 'main.OFFICIAL_STATEMENT=${LDFLAGS_STATEMENT}'"
       shell: bash
     - name: Build Windows App
       if: inputs.build == 'true' && runner.os == 'Windows' && inputs.nsis == 'false'
       working-directory: ${{ inputs.app-working-directory }}
-      run: wails build --platform ${{inputs.build-platform}} -webview2 ${{inputs.wails-build-webview2}} -o ${{inputs.build-name}} -tags '${{inputs.build-tags}}' -ldflags "-X main.Version=${{inputs.build-tags}} -X main.BuildKey=${{inputs.build-key}} -X main.VersionCommit=${{inputs.build-commit-message}}   -X main.OFFICIAL_STATEMENT=${{inputs.build-statement}}"
+      env:
+        LDFLAGS_VERSION: ${{ inputs.build-tags }}
+        LDFLAGS_BUILD_KEY: ${{ inputs.build-key }}
+        LDFLAGS_COMMIT_MESSAGE: ${{ inputs.build-commit-message }}
+        LDFLAGS_STATEMENT: ${{ inputs.build-statement }}
+      run: wails build --platform ${{inputs.build-platform}} -webview2 ${{inputs.wails-build-webview2}} -o ${{inputs.build-name}} -tags '${{inputs.build-tags}}' -ldflags "-X 'main.Version=${LDFLAGS_VERSION}' -X 'main.BuildKey=${LDFLAGS_BUILD_KEY}' -X 'main.VersionCommit=${LDFLAGS_COMMIT_MESSAGE}' -X 'main.OFFICIAL_STATEMENT=${LDFLAGS_STATEMENT}'"
       shell: bash
     - name: Build Windows App + Installer
       if: inputs.build == 'true' && runner.os == 'Windows' && inputs.nsis == 'true'
       working-directory: ${{ inputs.app-working-directory }}
-      run: wails build --platform ${{inputs.build-platform}} -webview2 ${{inputs.wails-build-webview2}} -nsis -o ${{inputs.build-name}} -tags '${{inputs.build-tags}}' -ldflags "-X main.Version=${{inputs.build-tags}}  -X main.BuildKey=${{inputs.build-key}} -X main.VersionCommit=${{inputs.build-commit-message}}  -X main.OFFICIAL_STATEMENT=${{inputs.build-statement}}"
+      env:
+        LDFLAGS_VERSION: ${{ inputs.build-tags }}
+        LDFLAGS_BUILD_KEY: ${{ inputs.build-key }}
+        LDFLAGS_COMMIT_MESSAGE: ${{ inputs.build-commit-message }}
+        LDFLAGS_STATEMENT: ${{ inputs.build-statement }}
+      run: wails build --platform ${{inputs.build-platform}} -webview2 ${{inputs.wails-build-webview2}} -nsis -o ${{inputs.build-name}} -tags '${{inputs.build-tags}}' -ldflags "-X 'main.Version=${LDFLAGS_VERSION}' -X 'main.BuildKey=${LDFLAGS_BUILD_KEY}' -X 'main.VersionCommit=${LDFLAGS_COMMIT_MESSAGE}' -X 'main.OFFICIAL_STATEMENT=${LDFLAGS_STATEMENT}'"
       shell: bash
     - name: Add macOS perms
       if: inputs.build == 'true' && runner.os == 'macOS'
